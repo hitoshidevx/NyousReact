@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
+import {url} from "../../utils/constants";
 
 import Menu from '../../components/menu';
 import Rodape from '../../components/rodape';
@@ -17,9 +18,7 @@ const Login = () => {
     const logar = (event) =>{
         event.preventDefault();
 
-        console.log(`${email} - ${senha}`)
-
-        fetch('https://localhost:44393/api/login', {
+        fetch(url + '/login', {
             method : 'POST',
             body : JSON.stringify({
                 email : email,
@@ -41,7 +40,7 @@ const Login = () => {
 
             let usuario = jwt_decode(data.token);
 
-            if(usuario.role === "Administrador"){
+            if(usuario.Role === "1"){
 
                 history.push('/admin/dashboard')
 

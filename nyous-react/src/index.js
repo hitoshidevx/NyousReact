@@ -7,10 +7,36 @@ import Cadastrar  from './pages/cadastrar';
 import NaoEncontrada  from './pages/naoencontrada';
 import Eventos  from './pages/eventos';
 import Dashboard  from './pages/admin/dashboard';
+import CrudEventos from './pages/admin/crudeventos';
+import CrudCategorias from './pages/admin/crudcategorias';
+import AcessoNegado  from './pages/acessonegado';
 
+import jwt_decode from "jwt-decode";
 import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
+
+const RotaPrivada = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest}
+    render={props =>
+      localStorage.getItem('token-nyous') !== null ?
+        (<Component {...props} />) :
+        (<Redirect to={{ pathname: '/login', state: { from: props.location } }} />)
+    }
+  />
+); 
+
+const RotaPrivadaAdmin = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest}
+    render={props =>
+      localStorage.getItem('token-nyous') !== null && jwt_decode(localStorage.getItem('token-nyous')).Role === "1" ?
+        (<Component {...props} />) :
+        (<Redirect to={{ pathname: '/acessonegado', state: { from: props.location } }} />)
+    }
+  />
+);
 
 // Define as rotas da aplicação
 const routing = (
@@ -19,8 +45,11 @@ const routing = (
         <Route exact path="/" component={Home}/>
         <Route path="/login" component={Login}/>
         <Route path="/cadastrar" component={Cadastrar}/>
-        <Route path="/eventos" component={Eventos}/>
-        <Route path="/admin/dashboard" component={Dashboard}/>
+        <RotaPrivada path="/eventos" component={Eventos}/>
+        <RotaPrivadaAdmin path="/admin/dashboard" component={Dashboard}/>
+        <RotaPrivadaAdmin path="/admin/categorias" component={CrudCategorias}/>
+        <RotaPrivadaAdmin path="/admin/eventos" component={CrudEventos}/>
+        <Route path="/acessonegado" component={AcessoNegado}/>
         <Route component={NaoEncontrada}/>
       </Switch>
   </Router>
